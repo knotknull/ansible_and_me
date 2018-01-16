@@ -1,4 +1,135 @@
-Notes on ansible: 
+Notes on ansible:
 ==================
 
+Ansible allows:
+- Change Management
+- Provisioning
+- Automation
+- Orchestration
 
+Change Management:
+  - Define a System State
+  - Enforce defined System State
+ex.   Apache Web Server Installed
+      Apache Web Server Version X.YY.Z
+      Apache Web Server Started
+
+Provisioning:
+  - Transition from one state to another
+  - Install software each time
+        - Install web server
+        - Copy config
+        - Copy web files
+        - Install security updates
+        - Start service
+
+Automation:
+  - Ordered Tasks
+  - Make decisions
+  - Ad-hoc tasks
+
+Orchestration:
+  - Coordination of automation between systems
+      (Task 1/System 1 >> Task 2/System 2 >> Task 3/System 3 >> Task /System 1)
+
+
+- Utilizes YAML for playbooks
+- Uses SSH
+- Understands root / sudo
+- encrypted vault (passwords, etc.)
+- easy to extend (URL / REST Calls/ Shell Commands / Scripts)
+- Ansible Galaxy (community based repo)
+
+
+Ansible Control Server ----> Remote Server
+Control Server Requirements:
+  - Python 2.6+
+  - Must by *NIX (Not supported on Windows for Control Server)
+
+Remote Server:
+  - Python 2.5+   (Python 2.4 w/ simplejson)
+  - SSH
+  - For Windows: Need Remote Powershell
+  - Python 3 support ???
+
+###############################################################################
+
+Architecture:
+
+                                                                      Remote
+  ----------------                                                    Servers
+  :              :                                                        :--:
+  :   Inventory  :                                                :-----> :--:
+  :              :                                                :
+  ----------------                                                :       :--:
+         :                                                        :-----> :--:
+         V                                       :---:            :
+  ----------------       ------------------      : P :            :       :--:
+  :              :       :                :      : Y :     SSH    :-----> :--:
+  :   Playbook   :  -->  : Ansible Config : ---> : T :  ------->> :
+  :              :       :                :      : H :            :       :--:
+  ----------------       ------------------      : O :            :-----> :--:
+         ^                                       : N :            :
+         :                                       :---:            :       :--:
+  ----------------                                                :-----> :--:
+  :              :
+  :   Modules    :
+  :              :
+  ----------------
+
+
+Inventory:
+Text file of servers, Host level vars, groups, roles, user accounts
+Can be a script that retrieves this information.
+[ Think hosts file ]
+
+
+Modules:
+Programmed unit of work, sets of actions, internal / external
+i.e. using yum vs. apt
+
+Playbooks:
+Files created to execute task or set of tasks.  Made of individuals plays
+
+Play:
+Single set of tasks using modules executed on defined hosts.
+
+Ansible Config:
+Global vars for ansible and update defaults. Can override default configs
+dependent on location of file.
+   i.e. Can override only for a specific playbook.
+
+Ansible builds plays / playbook and creates a python package that is pushed to
+remote systems.
+
+Variables:
+  - Host Variables:  Variables defined in inventory files used on hosts
+                i.e. sudo account
+
+  - Fact Variables:  Fact data / environmental data, gathered from remote hosts
+                (OS, IP Address, Memory, CPU speeds)
+
+  - Dynamic Variables:  Created during course of playbook and then destroyed
+            Variable set during execution of play, created at runtime.
+
+###############################################################################
+Execution Flow
+
+  - Evaluate Playbook
+  - Creates Python package
+  - Identify hosts to deploy to
+  - Deploy package
+  - Execute package on remote
+  - Results returned via JSON
+  - Python package removed on remote system
+
+Multiple machines can be deployed against at the same time
+
+Execution Types
+
+  Remote Execution Type:  package executed on remote system
+  Local Execution Type :  local ansible server is executing package
+
+Local execution type done for servers that can't receive a python package.
+Mostly webservice / API calls.  Local calls, HTTP request remotely.
+i.e. configuring Network equipment (can't push package but can make API calls)
