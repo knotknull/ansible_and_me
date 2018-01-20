@@ -1,0 +1,2 @@
+# Run an adhoc command via ansible:  -a allow parameters to command module
+ansible all -i inventory -u vagrant -m command -k -a "ls /tmp/"

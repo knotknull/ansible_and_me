@@ -1,0 +1,5 @@
+## -u user -m module (ping) -k prompt for password
+ansible all -i inventory -u vagrant -m ping -k
+
+## run with verbose / debug
+ansible all -i inventory -u vagrant -m ping -k -vvv

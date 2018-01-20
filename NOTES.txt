@@ -133,3 +133,84 @@ Execution Types
 Local execution type done for servers that can't receive a python package.
 Mostly webservice / API calls.  Local calls, HTTP request remotely.
 i.e. configuring Network equipment (can't push package but can make API calls)
+
+
+
+###############################################################################
+## Install Ansible
+###############################################################################
+Once vagrant and virtualbox are installed and setup (See Vagrant_NOTES.txt),
+install ansible on the acs VM.
+
+1.  Login to acs vm
+> vagrant ssh acs
+
+2. Install ansible (on debian)
+sudo apt-get install ansible
+
+[on centos]
+sudo yum install epel-release
+sudo yum install ansible
+
+[install via code compile ]
+sudo yum install gcc                  ## install compiler
+sudo yum install python-setuptools    ## install python tools
+sudo yum install epel-release         ## allow EPEL packages
+sudo yum install python-pip           ## install python install package
+sudo yum install python-devel         ## install python dev headers
+sudo pip install ansible              ## install ansible via pip
+
+###############################################################################
+## Configure Ansible
+###############################################################################
+vagrant ssh acs
+
+# create an inventory file
+> cat inventory
+192.168.33.20
+192.168.33.30
+
+# ping via ansible
+# -u user -m module -k prompt for password
+ansible 192.168.33.20 -i inventory -u vagrant -m ping -k
+>SSH password:
+192.168.33.20 | success >> {
+    "changed": false,
+    "ping": "pong"
+}
+ansible all -i inventory -u vagrant -m ping -k
+SSH password:
+192.168.33.20 | success >> {
+    "changed": false,
+    "ping": "pong"
+}
+
+192.168.33.30 | success >> {
+    "changed": false,
+    "ping": "pong"
+}
+
+# Run an adhoc command via ansible
+NOTE: command module is default hence:
+     ansible all -i inventory -u vagrant -k -a "ls /tmp/"
+ansible all -i inventory -u vagrant -m command -k -a "ls /tmp/"
+> SSH password:
+192.168.33.20 | success | rc=0 >>
+ks-script-nR80gm
+ks-script-nR80gm.log
+script.sh
+stderr
+yum.log
+
+192.168.33.30 | success | rc=0 >>
+ks-script-nR80gm
+ks-script-nR80gm.log
+pip-uLEl8k-uninstall
+script.sh
+stderr
+yum.log
+
+NOTE: command module and shell module allows you to both run commands.  However,
+command module runs a command inside of python, the shell module runs commands
+directly against the shell, hence shell module can use shell variables like
+$HOME or $PATH, command module cannot.
