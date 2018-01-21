@@ -214,3 +214,65 @@ NOTE: command module and shell module allows you to both run commands.  However,
 command module runs a command inside of python, the shell module runs commands
 directly against the shell, hence shell module can use shell variables like
 $HOME or $PATH, command module cannot.
+
+###############################################################################
+## Inventory Fundamentals
+###############################################################################
+Inventory file can be located anywhere on filesystem.
+Behavioral Parameters:
+  - configurations that can be applied to a system or group of systems
+        - ssh users / passwords / private key file / path to python 2.6
+
+Groups:
+  - group systems as test or dev or "web servers"
+
+Groups of groups:
+  - Parent groups that you can add sub-groups to
+        - data center west, dc east, all_test, ALL-PROD
+
+Assign Variables:
+  - Assign variables to systems and groups.
+        - NTP_SERVER, SYSLOG-SRVR
+        - Apply to entire data center
+        - Attach a variable to group.  All servers in group gets that variable
+
+Scale out with multiple files:
+  - Avoid one large inventory file
+
+Static / Dynamic:
+  - Inventory file can be static
+  - Can also be dynamic
+          - make file executable
+          - ansible will execute the file and use data returned back.
+
+
+
+Example File:
+  - Per host variable described on same line as host.
+  - Example below shows ssh credentials defined only for db1
+  - db2 gets python interpreter path explicitly set
+  - :children keyword indicates it is a parent group and
+     inventory beneath are groups
+  - :vars keyword variable for an entire group
+      - all hosts under that group are assigned these vars
+
+[db]
+db1.company.com ansible_ssh_user=aaron ansible_ssh_pass=123
+db2.company.com ansbile_python_interpreter=/usr/bin/python
+
+
+[datacenter-west:children]
+db
+
+[datacenter-west:vars]
+ansible_ssh_user=ansible_user
+ansible_ssh_pass=#45e!GH
+ntp-server=5.6.7.8
+
+
+
+
+
+
+
+###############################################################################
