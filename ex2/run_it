@@ -1,0 +1,8 @@
+# Runs ping against web1 server 
+ansible web1 -i inventory -m ping
+
+# Runs ping against dbservers group 
+ansible dbservers -i inventory -m ping
+
+# Runs ping against datacenter parent group 
+ansible datacenter -i inventory -m ping
