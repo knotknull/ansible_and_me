@@ -271,6 +271,65 @@ ntp-server=5.6.7.8
 
 
 
+###############################################################################
+## Scale out inventory files
+###############################################################################
+
+Break up inventroy utilizing directories.  Example Basic Directory structure:
+[ Relative to same path]
+
+  |-----group_vars
+  |-----|-----all
+  |-----|-----db
+  |
+  |-----host_vars
+  |-----|-----web1
+  |
+  |-----inventory_prod
+  |-----inventory_test
+
+
+Multi-Environment Directory Structure
+
+  |-----production
+  |--------|
+  |--------|-----group_vars
+  |--------|-----|-----all
+  |--------|-----|-----db
+  |--------|
+  |--------|-----host_vars
+  |--------|-----|-----web1
+  |--------|
+  |--------|-----inventory_prod
+  |-----test
+  |--------|
+  |--------|-----group_vars
+  |--------|-----|-----all
+  |--------|-----|-----db
+  |--------|
+  |--------|-----host_vars
+  |--------|-----|-----web1
+  |--------|
+  |--------|-----inventory_test
+
+Order of Operations (Precedence)
+1.  (Group_Vars) All
+2.  (Group_Vars) GroupName
+3.  (Host_Vars) HostName
+
+If there is a variable name in all three levels (i.e. LOGDIR). The HostName
+will have the highest precedence because it is the mose specific.
+
+###############################################################################
+## Variable file written in YAML
+## NOTE:  --- indicate file is YAML.
+##        Comments use #
+##        Variables are Key/Value pair delimited with :
+###############################################################################
+---
+# file: group_vars/dcl-west
+ntp: ntp-west.example.com
+syslog: logger-west.example.com
 
 
 
