@@ -1,0 +1,9 @@
+## This fails because of default host_key_checking
+## Override in ansible.cfg file
+## host_key_checking=False 
+##
+## Uncomment the below to override the ansible.cfg value 
+##
+export ANSIBLE_HOST_KEY_CHECKING=True
+
+ansible web1 -i inventory_prod -m ping
