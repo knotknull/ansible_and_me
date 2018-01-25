@@ -346,6 +346,105 @@ ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345
 ## with sudo permissions
 ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345"  --sudo
 
+If there is a value in groups_var/weberservers for username, the above will
+use the more specific group level variable over the all level variable
+
+ex.  All level variable groups_var/all sets username: all_user
+
+vagrant@acs:~/ex4/production$ ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345" --sudo
+web1 | success >> {
+    "changed": true,
+    "comment": "",
+    "createhome": true,
+    "group": 501,
+    "home": "/home/all_username",
+    "name": "all_username",
+    "password": "NOT_LOGGING_PASSWORD",
+    "shell": "/bin/bash",
+    "state": "present",
+    "system": false,
+    "uid": 501
+}
+
+
+ex.  Group level variable groups_var/weservers sets username: group_user
+
+vagrant@acs:~/ex4/production$ ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345" --sudo
+web1 | success >> {
+    "changed": true,
+    "comment": "",
+    "createhome": true,
+    "group": 502,
+    "home": "/home/group_user",
+    "name": "group_user",
+    "password": "NOT_LOGGING_PASSWORD",
+    "shell": "/bin/bash",
+    "state": "present",
+    "system": false,
+    "uid": 502
+}
+
+vs.
+
+ex.  Host level variable host_vars/web1 sets username: web1_user
+
+vagrant@acs:~/ex4/production$ ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345" --sudo
+web1 | success >> {
+    "changed": true,
+    "comment": "",
+    "createhome": true,
+    "group": 503,
+    "home": "/home/web1_user",
+    "name": "web1_user",
+    "password": "NOT_LOGGING_PASSWORD",
+    "shell": "/bin/bash",
+    "state": "present",
+    "system": false,
+    "uid": 503
+}
+
+
+###############################################################################
+## Ansible configuration files
+###############################################################################
+
+[ Configuration Order of Operations ]
+
+1. $ANSIBLE_CONFIG   # check env var first
+2. ./ansible.cfg     # check current directory of playbook or adhoc command
+3. ~/.ansible.cfg    # check hidden file in $HOME directory of logged in acct
+4. /etc/ansible/ansible.cfg   # Global config file, last place to check
+
+NOTE: Configuration files are not merged, first one wins
+
+Can override config file by setting env var:
+
+$ANSIBLE_<config_setting>=value
+i.e.
+export ANSIBLE_FORKS=10      # Override FORKS value in config file
+
+[Common Defaults]
+forks:  Default = 5   # Total number of parallel operations Ansible executes /
+                      # Prod recommended to 20 +/-
+
+host_key_checking:  Default = True   # Check ssh key fingerprint, true for prod
+                                     # Dev = false due to dynamic dev env
+
+log_path:  Default = Null            # Set path to log file, ensure all users
+                                     # have write perms to file
+
+
+[ Config Info ]
+docs.ansible.com > Popular Topics > Getting Started > Configuration File
+http://docs.ansible.com/ansible/latest/intro_configuration.html
+
+Over 80+ config settings
+
+
+
+
+
+
 
 
 
