@@ -331,6 +331,22 @@ will have the highest precedence because it is the mose specific.
 ntp: ntp-west.example.com
 syslog: logger-west.example.com
 
+Using the above directory structure, if we have a group_vars/all file with
+---
+
+# This is our user
+username: all_username
+
+
+Then the following command will create a user with {{username}} variable set
+in the group_vars/all file.
+
+ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345"
+
+## with sudo permissions
+ansible webservers -i inventory_prod -m user -a"name={{username}} password=12345"  --sudo
+
+
 
 
 
