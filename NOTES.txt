@@ -512,4 +512,22 @@ ansible-doc -s <module_name> : playbook examble (-s = snippets)
                     Can eneable services to start on boot
 
 
+[ Host / Group Target Patterns ]
+NOTE: webservers:dbservers
+
+ansible webservers:dbservers -i inventory -m service -a  "name=iptables state=stopped" --sudo
+
+OR  pattern (group1:group2)    all hosts in both group 1 and group 2
+NOT pattern (!group2)          all hosts NOT in group 2
+Wildcard pattern (web*.example.com)   all hosts matching web*.example.com
+Regex pattern  (~web[0-9]+)    NOTE: regex pattern must start with ~
+AND pattern (group1:&group2)   This is an intersection between the two groups
+                               ex. Webservers:&Production
+
+Complex patterns:    Webservers:&prod:!python3
+                     All Webservers and Production but not in python3
+
+
+
+
 ###############################################################################

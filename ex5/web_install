@@ -1,0 +1,4 @@
+## For all webservers, check that httpd is present (i.e. already installed)
+##
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible webservers -i inventory -m yum -a  "name=httpd state=present" --sudo

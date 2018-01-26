@@ -1,0 +1,6 @@
+## For all webservers, start httpd service
+## NOTE: adding  ANSIBLE_HOST_KEY_CHECKING=False so that install doesnt' fail if we don't already have host key
+## NOTE: adding --sudo at end to allow install on target box
+## 
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible dbservers -i inventory -m service -a  "name=mysqld state=started enabled=yes" --sudo
