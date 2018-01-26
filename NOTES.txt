@@ -442,11 +442,74 @@ Over 80+ config settings
 
 
 
+###############################################################################
+## Ansible Modules
+###############################################################################
+
+3 types of modules:
+  - Core       : Supported by ansible directly
+  - Extras     : Created by 3rd Parties / Community and included in distro
+  - Deprecated : Module may be pulled from distro with another replacing it
+
+[Module Documentation]
+
+ansible-doc -l  : List all module docs
+
+> ansible-doc -l
+a10_server             Manage A10 Networks AX/SoftAX/Thunder/vThunder devices' server object.
+a10_server_axapi3      Manage A10 Networks AX/SoftAX/Thunder/vThunder devices
+a10_service_group      Manage A10 Networks AX/SoftAX/Thunder/vThunder devices' service groups.
+a10_virtual_server     Manage A10 Networks AX/SoftAX/Thunder/vThunder devices' virtual servers.
+accelerate             Enable accelerated mode on remote node
 
 
+ansible-doc <module_name> : specific documentation about that module
+
+> ansible-doc ec2
+> EC2    (/usr/lib/python2.7/dist-packages/ansible/modules/cloud/amazon/ec2.py)
+
+        Creates or terminates ec2 instances. `state=restarted' was added in 2.2
 
 
+ansible-doc -s <module_name> : playbook examble (-s = snippets)
 
+> ansible-doc -s ec2
+- name: create, terminate, start or stop an instance in ec2
+  ec2:
+      assign_public_ip:      # when provisioning within vpc, assign a public IP address. Boto library must be 2.13.0+
+      aws_access_key:        # AWS access key. If not set then the value of the AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY or
+                               EC2_ACCESS_KEY environment variable is used.
+      aws_secret_key:        # AWS secret key. If not set then the value of the AWS_SECRET_ACCESS_KEY, AWS_SECRET_KEY,
+                               or EC2_SECRET_KEY environment variable is used.
+      count:                 # number of instances to launch
+
+
+[Module Categories]
+  - Manage Servers
+  - Deploy Configurations
+  - Configure Network Equipment
+  - Maintain Virtual Servers
+  - Manage databases and tables
+  - Deploy load-balancer configs
+
+[Main Modules]
+  - Copy Module: Copy file from local box to remote
+                 Has backup capability
+                 Can do validation remotely
+
+  - Fetch Module: Pulls file from remote host to local system
+                  Can use md5 checksums to validate
+
+  - Apt Module: Manages install applications on Debian-based systems
+                Can install, update, delete packages
+                Can update entire system
+
+  - Yum Module: Manages install applications on Redhat-based systems
+                Can install, update, delete packages
+                Can update entire system
+
+  - Service Module: Can stop, start, restart services
+                    Can eneable services to start on boot
 
 
 ###############################################################################
