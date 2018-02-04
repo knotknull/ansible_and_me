@@ -678,8 +678,246 @@ total 72
 
 
 ###############################################################################
-## Ansible Modules
+## Ansible Plays and Playbooks
 ###############################################################################
+
+ - Plays map hosts to tasks
+ - a play can have multiple tasks
+ - a playbook can have multiple plays
+
+Playbook example w/ 2 plays:
+
+---
+- hosts: webservers        << Each play always has a hosts and tasks declaration
+  remote_user: root
+  tasks:
+  - name: Install Apache   << Each play always has a hosts and tasks declaration
+    yum: name=httpd state=present
+  - name: Start Apache
+    service: name=httpd state=started
+
+- hosts: dbservers
+  remote_user: root
+  tasks:
+  - name: Install MySQL
+    yum: name=mysql-server state=present   << Each task calls a module
+  - name: Start MySQL
+    service: name=mysqld state=started     << module can be passed parameters
+
+
+
+Example of Play declarations:
+- hosts: webservers         << define targets: hosts, groups or target patterns
+  vars:                     << declare variables per play
+    git_repo: https://github.com/repo.git
+    http_port: 8080
+    db_name: wordpress
+  sudo: yes                 << user to run tasks (Note: no under vars)
+  sudo_user: wordpress_user
+  gather_facts: no          << don't gather facts on host, default is yes
+
+
+NOTE: Tasks are executed in order - top down.  Tasks use module
+
+
+Example of Play tasks:
+  tasks:
+  - name: Name this task for readability
+    module: parameters=go_here
+
+  - name: Deply Apache Configuration File
+    copy: src=/ansible/files/conf/httpd.conf
+          dest=/etc/httpd/conf/
+
+
+NOTE: Name of tasks is displayed as it is currently being executed
+
+
+
+## Execute Playbooks
+##
+> ansible-playbook playbook.yml
+
+NOTE: if there is a failure, a retry file is created and you can rerun the
+playbook utilizing the --limit option with the created retry file ex.
+
+ansible-playbook playbook.yml --limit /home/vagrant/web_db_playbook.retry
+
+
+> cat /home/vagrant/web_db.retry
+db1
+
+
+
+Sample Playbook:
+
+---
+- hosts: webservers
+  sudo: yes
+
+  tasks:
+  - name: Ensure that Apache is installed
+    yum: name=httpd state=present
+
+  - name: Start Apache Services
+    service: name=httpd enabled=yes state=started
+
+- hosts: dbservers
+  sudo: yes
+
+  tasks:
+  - name: Ensure MySQL is installed
+    yum: name=mysql-server state=present
+
+  - name: Start MySQL
+    service: name=mysqld state=started
+
+- hosts: webservers:dbservers
+  sudo: yes
+
+  tasks:
+  - name: Stop IPTABLES now ...
+    service: name=iptables state=stopped
+
+
+## Including files
+##
+  - break up long paybooks
+  - resue playbooks
+  - add external variable files (i.e. dev / uat / prod )
+ex.
+
+  tasks:
+    - include: wordpress.yml
+      vars:
+        sitename: Test Site
+    - include: loadbalancer.yml
+    - include_vars: variables.yml
+
+## Register Task Output
+##
+  - use output of one task to another task
+  - feed output of one to input of another
+ex.
+
+  tasks:
+    - shell: /usr/bin/whoami
+      register: username    << user register to capture output of task and reuse
+    - file: path=/home/myfile.txt
+            owner={{ username }}   << utilize capture register value
+
+
+## Debug Module
+##
+  - provide info of running play
+  - debug module can take 2 parameters msg / var
+      - msg prints out string message to user
+      - var prints value of variable
+
+ex.
+
+  tasks:
+    - debug: msg="This host is {{ inventory_hostname }} during execution"
+
+    - shell: /usr/bin/whoami
+      register: username
+    - debug: var=username
+
+
+## Prompt for Input
+##
+ex.
+
+- hosts: web1
+
+  vars_prompt:
+    - name: "sitename"
+      prompt: "What is the new site name?"
+
+  tasks:
+   - debug: msg="The name is {{ sitename }}"
+
+
+
+## Playbook Handlers
+##
+  - Tasks w/ asynchronous execution
+  - Only runs tasks when notified
+  - Tasks only notify when state=changed
+  - Does not run until all playbook tasks have executed
+  - Most common for restarting services to load changes
+  - Executed only once
+  - handlers have same syntax as tasks
+
+ex.
+  tasks:
+   - copy: src=files/httpd.conf
+           dest=/etc/httpd/conf/
+
+     notify:
+       - Apache Restart
+
+  handlers:
+   - name: Apache Restart
+     service: name=httpd state=restarted
+
+
+## Conditional execution using when
+##
+Selective installs dependent on OS type:
+
+
+  tasks:
+   - yum: name=httpd state=present
+     when: ansible_os_family == "RedHat"
+
+   - apt: name=apache2 state=present
+     when: ansible_os_family == "Debian"
+
+
+## Conditional clause based on output
+##
+  - track whether previous track ran
+  - searches JSON result for status
+  - Status Options:  success, failed, skipped
+
+ex.
+  tasks:
+   - command: ls /path/doesnt/exist
+     register: result
+     ignore_errors: yes
+
+   - debug: msg="Failure!"
+     when: result|failed
+
+
+## Templates
+##
+  - Uses Jinja2 Engine
+  - Insert variables into static files
+  - Creates and copies dynamic files
+  - Deploy custom configurations
+
+ Modify Template and Copy
+
+ex.
+  tasks:
+    - template:
+        src=templates/httpd.j2               << take file w/ predefined var name
+        dest=/etc/httpd/conf/httpd.conf      << copy substituted file to dest
+        owner=httpd                          << insert var name into template
+
+ex httpd.j2
+....
+<VirtualHost *:80>
+ ServerAdmin {{server_admin}}  << double braced vars substituted with var values
+ DocumentRoot {{site_root}}
+ ServerName {{inventory_hostname}}
+</VirtualHost>
+....
+
+
+
 
 
 

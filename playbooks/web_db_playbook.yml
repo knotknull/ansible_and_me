@@ -1,0 +1,16 @@
+---
+- hosts: webservers        << Each play always has a hosts and tasks declaration
+  remote_user: root
+  tasks:
+    - name: Install Apache   << Each play always has a hosts and tasks declaration
+      yum: name=httpd state=present
+    - name: Start Apache
+      service: name=httpd state=started
+
+- hosts: dbservers
+  remote_user: root
+  tasks:
+  - name: Install MySQL
+    yum: name=mysql-server state=present   << Each task calls a module
+  - name: Start MySQL
+    service: name=mysqld state=started     << module can be passed parameters

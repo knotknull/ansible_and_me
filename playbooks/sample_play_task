@@ -1,0 +1,7 @@
+  tasks:
+  - name: Name this task for readability
+    module: parameters=go_here
+
+  - name: Deply Apache Configuration File
+    copy: src=/ansible/files/conf/httpd.conf
+          dest=/etc/httpd/conf/
