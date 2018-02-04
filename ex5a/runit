@@ -1,0 +1,10 @@
+ansible web1 -i inventory -m setup
+
+## Run setup w/ filter for eth
+ansible web1 -i inventory -m setup -a "filter=ansible_eth*"
+
+## Run setup w/ filter for mounts
+ansible web1 -i inventory -m setup -a "filter=ansible_mounts"
+
+## Run against all hosts in inventory and w/ the --tree parameter and dump to setup file
+ansible all -i inventory -m setup --tree ./setup 

@@ -528,6 +528,159 @@ Complex patterns:    Webservers:&prod:!python3
                      All Webservers and Production but not in python3
 
 
+###############################################################################
+## Setup Module
+###############################################################################
+
+Setup module like an inventory modules / fact module. Retrieves facts about OS
+and system information.
+
+> ansible web1 -i inventory -m setup
+web1 | success >> {
+    "ansible_facts": {
+        "ansible_all_ipv4_addresses": [
+            "10.0.2.15",
+            "192.168.33.20"
+        ],
+        "ansible_all_ipv6_addresses": [
+            "fe80::a00:27ff:fe15:d519",
+            "fe80::a00:27ff:fe3f:93c3"
+        ],
+        "ansible_architecture": "x86_64",
+        "ansible_bios_date": "12/01/2006",
+        "ansible_bios_version": "VirtualBox",
+        "ansible_cmdline": {
+            "KEYBOARDTYPE": "pc",
+            "KEYTABLE": "us",
+            "LANG": "en_US.UTF-8",
+            "SYSFONT": "latarcyrheb-sun16",
+            "quiet": true,
+            "rd_LVM_LV": "VolGroup/lv_root",
+            "rd_NO_DM": true,
+            "rd_NO_LUKS": true,
+            "rd_NO_MD": true,
+            "rhgb": true,
+            "ro": true,
+            "root": "/dev/mapper/VolGroup-lv_root"
+        },
+.
+.
+.
+.
+.
+.
+        "ohai_ohai_time": 1517764020.324803,
+        "ohai_os": "linux",
+        "ohai_os_version": "2.6.32-431.el6.x86_64",
+        "ohai_platform": "centos",
+        "ohai_platform_family": "rhel",
+        "ohai_platform_version": "6.5",
+        "ohai_root_group": "root",
+        "ohai_uptime": "10 days 03 hours 05 minutes 19 seconds",
+        "ohai_uptime_seconds": 875119,
+        "ohai_virtualization": {
+            "role": "guest",
+            "system": "vbox"
+        }
+    },
+    "changed": false
+}
+
+## Can run setup with a filter parameter for eth
+##
+> ansible web1 -i inventory -m setup -a "filter=ansible_eth*"
+web1 | success >> {
+    "ansible_facts": {
+        "ansible_eth0": {
+            "active": true,
+            "device": "eth0",
+            "ipv4": {
+                "address": "10.0.2.15",
+                "netmask": "255.255.255.0",
+                "network": "10.0.2.0"
+            },
+            "ipv6": [
+                {
+                    "address": "fe80::a00:27ff:fe15:d519",
+                    "prefix": "64",
+                    "scope": "link"
+                }
+            ],
+            "macaddress": "08:00:27:15:d5:19",
+            "module": "e1000",
+            "mtu": 1500,
+            "promisc": false,
+            "type": "ether"
+        },
+        "ansible_eth1": {
+            "active": true,
+            "device": "eth1",
+            "ipv4": {
+                "address": "192.168.33.20",
+                "netmask": "255.255.255.0",
+                "network": "192.168.33.0"
+            },
+            "ipv6": [
+                {
+                    "address": "fe80::a00:27ff:fe3f:93c3",
+                    "prefix": "64",
+                    "scope": "link"
+                }
+            ],
+            "macaddress": "08:00:27:3f:93:c3",
+            "module": "e1000",
+            "mtu": 1500,
+            "promisc": false,
+            "type": "ether"
+        }
+    },
+    "changed": false
+}
+
+## Can run setup with a filter parameter for mounts
+##
+> ansible web1 -i inventory -m setup -a "filter=ansible_mounts"
+web1 | success >> {
+    "ansible_facts": {
+        "ansible_mounts": [
+            {
+                "device": "/dev/mapper/VolGroup-lv_root",
+                "fstype": "ext4",
+                "mount": "/",
+                "options": "rw",
+                "size_available": 194829983744,
+                "size_total": 206629191680
+            },
+            {
+                "device": "/dev/sda1",
+                "fstype": "ext4",
+                "mount": "/boot",
+                "options": "rw",
+                "size_available": 448076800,
+                "size_total": 507744256
+            }
+        ]
+    },
+    "changed": false
+}
+
+
+## Run setup on all inventory and dump to setup direcotyr
+##
+> ansible all -i inventory -m setup  --tree ./setup
+
+vagrant@acs:~/ex5a$ ls -ltR setup
+setup:
+total 72
+-rw-rw-r-- 1 vagrant vagrant 33387 Feb  4 17:32 db1
+-rw-rw-r-- 1 vagrant vagrant 33386 Feb  4 17:32 web1
+
+
+
+###############################################################################
+## Ansible Modules
+###############################################################################
+
 
 
 ###############################################################################
