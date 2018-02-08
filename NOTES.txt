@@ -918,7 +918,168 @@ ex httpd.j2
 
 
 
+###############################################################################
+## Roles
+###############################################################################
 
+Roles automate your "includes" with pre-defined directory structures
+and search paths.
+
+
+
+ROLE: Builder
+
+  - tasks:
+    - name: install gcc
+    - name: install jdk
+    - name: setup git
+
+has all required packages and configurations for BUILD rold
+
+ROLE: Server-Common
+
+  - tasks:
+    - name: configure SNMP
+    - name: configure SYSLOG
+    - name: configure NTP
+
+
+ROLE: Repo
+
+  - tasks:
+    - name: git
+    - name: configure
+    - name: pull latest
+
+Directory structure can describe roles
+
+  |-----roles
+  |--------|-----builders
+  |--------|-----server-common
+  |--------|-----|-----defaults
+  |--------|-----|-----files
+  |--------|-----|-----handlers
+  |--------|-----|-----meta
+  |--------|-----|-----tasks
+  |--------|-----|-----templates
+  |--------|-----|-----vars
+  |--------|-----webservers
+
+Role is a sub-directory under a parent "roles" directory.  You can reference
+files, templates, tasks, etc directly without using path.
+
+Ansible looks for main.yml under directory:
+
+  |--------|-----server-common
+  |--------|-----|-----defaults
+  |--------|-----|-----files
+  |--------|-----|-----handlers
+  |--------|-----|-----|------main.yml
+  |--------|-----|-----meta
+  |--------|-----|-----tasks
+  |--------|-----|-----|------main.yml
+  |--------|-----|-----templates
+  |--------|-----|-----vars
+  |--------|-----|-----|------main.yml
+
+
+Add include statements to bring in other functionality
+
+  |--------|-----|-----tasks
+  |--------|-----|-----|------main.yml
+                              include: webservers.yml
+                              include: dbservers.yml
+
+NOTE: vars file is expecting key / value pairs and not include statements.
+
+site.yml file holds infrastructure for this role.
+
+  |--------|-----|-----site.yml
+  |--------|-----|-----handlers
+  |--------|-----|-----|------main.yml
+  |--------|-----|-----tasks
+  |--------|-----|-----|------main.yml
+  |--------|-----|-----templates
+  |--------|-----|-----vars
+  |--------|-----|-----|------main.yml
+
+NOTE: Can add include statements to site.yml
+  |--------|-----|-----site.yml
+                       include: webservers.yml
+                       include: dbservers.yml
+
+NOTE: use tags to define categories of playbooks and tasks.
+ex.
+  |--------|-----|-----site.yml
+                       include: webservers.yml tags=web
+                       include: dbservers.yml tags=db
+
+
+NOTE: can define tags in tasks
+ex.
+  tasks:
+    debug: msg="This will only run on the tag 'debug'"
+    tags:
+      - debug
+
+    debug: msg="You can use multiple tags"
+    tags:
+      - debug
+      - stuff
+
+
+Add roles to playbook in global declaration
+ex.
+
+---
+- hosts: code-dev
+  roles:
+    - server-common
+    - builders
+  gather_facts: no
+
+  tasks:
+    # build your extra tasks here like
+    # creating users or deploying configs
+
+Can specifiy pre_tasks and post_tasks
+pre_tasks:
+    - executes before roles
+       i.e - setup maintenance windows
+           - remove servers from load balancers
+           - silence alarms
+
+post_tasks:
+    - executes after roles
+       i.e - clearing maintenance windows
+           - add server to load balancers
+           - enable alarms
+ex.
+
+---
+- hosts: webservers
+  pre_tasks:
+    - # Remove from load balancer
+  roles:
+    - server-common
+    - jboss
+  post_tasks:
+    - # Add to load balancer
+  gather_facts: no
+
+
+
+## Execute roles
+##
+ansible-playbook site.yml
+
+## Execute Tagged Roles
+##
+ansible-playbook site.yml -tags "web"
+
+## Execute portion of Tagged Roles
+##
+ansible-playbook site.yml -tags "web" -limit atlanta
 
 
 ###############################################################################
