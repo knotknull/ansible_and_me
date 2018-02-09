@@ -1083,3 +1083,59 @@ ansible-playbook site.yml -tags "web" -limit atlanta
 
 
 ###############################################################################
+## Creating Roles
+###############################################################################
+/inventory
+/ansible.cfg
+/webserver.yml                      ## playbook to execute webserver role
+/dbserver.yml                       ## playbook to execute dbserver role
+/site.yml                           ## site-wide playbook
+/roles/                             ## Holds Roles info
+/roles/webserver/                   ## webserver role
+/roles/webserver/vars               ## vars for webserver role
+/roles/webserver/vars/main.yml
+/roles/webserver/tasks              ## tasks for webserver role
+/roles/webserver/tasks/main.yml
+/roles/webserver/handlers           ## handlers for webserver role
+/roles/webserver/handlers/main.yml
+/roles/webserver/templates          ## templates for webserver role
+/roles/webserver/templates/httpd.j2
+/roles/webserver/templates/index.j2
+/roles/dbserver/                    ## dbserver role
+/roles/dbserver/tasks               ## tasks for dbserver role
+/roles/dbserver/tasks/main.yml
+/roles/server_common/               ## server_common role
+/roles/server_common/handlers       ## handlers for server_common role
+/roles/server_common/handlers/main.yml
+/roles/server_common/tasks          ## tasks for server_common role
+/roles/server_common/tasks/main.yml
+/roles/server_common/tasks/snmp.yml
+/roles/server_common/tasks/syslog.yml
+/roles/server_common/templates      ## templates for server_common role
+/roles/server_common/templates/rsyslog.conf.j2
+/roles/server_common/templates/snmpd.conf.j2
+/roles/server_common/vars           ## vars for server_common role
+/roles/server_common/vars/main.yml
+
+
+
+> ansible-playbook webserver.yml    ## creates a playbook from roles/webserver
+> ansible-playbook dbserver.yml     ## creates a playbook from roles/dbserver
+
+
+> ansible-playbook site.yml         ## runs all playbooks declared
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
