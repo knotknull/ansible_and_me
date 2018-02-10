@@ -1130,11 +1130,41 @@ ansible-playbook site.yml -tags "web" -limit atlanta
 
 
 
+###############################################################################
+## Getting Roles
+###############################################################################
+
+- create roles
+- find roles to download
+  - Ansible Galaxy:  download / share / review roles
+
+## Install a role from Ansible Galaxy
+> ansible-galaxy install username.role
 
 
+## Browser galaxy roles:  galaxy.ansible.com/list
+
+## Download role from ansible galaxy:
+
+> sudo ansible-galaxy install geerlingguy.git
+downloading role 'git', owned by geerlingguy
+no version specified, installing 1.4.1
+- downloading role from https://github.com/geerlingguy/ansible-role-git/archive/1.4.1.tar.gz
+- extracting geerlingguy.git to /etc/ansible/roles/geerlingguy.git
+geerlingguy.git was installed successfully
 
 
+## create playbook to execute git install role
+> vi git.yml
+---
+- hosts: webservers
+  sudo: yes
+  roles:
+   - geerlingguy.git
 
+
+##  Run an installed role:
+> ansible-playbook git.yml
 
 
 
